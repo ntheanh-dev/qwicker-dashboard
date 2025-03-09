@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
@@ -16,6 +16,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import { useRouter } from 'src/routes/hooks';
 
 import { bgGradient } from 'src/theme/css';
+import { AuthContext } from 'src/auth/AuthProvider';
 
 import Logo from 'src/components/logo';
 import Iconify from 'src/components/iconify';
@@ -24,24 +25,40 @@ import Iconify from 'src/components/iconify';
 
 export default function LoginView() {
   const theme = useTheme();
-
   const router = useRouter();
-
+  const [credentials, setCredentials] = useState({ username: '', password: '' });
+  const { login } = useContext(AuthContext);
   const [showPassword, setShowPassword] = useState(false);
-
-  const handleClick = () => {
-    router.push('/dashboard');
+  const [error, setError] = useState('');
+  const handleChange = (e) => {
+    setCredentials({ ...credentials, [e.target.name]: e.target.value });
+  };
+  const handleLogin = async () => {
+    setError(''); // Reset lỗi trước đó
+    try {
+      await login(credentials.username, credentials.password);
+      router.push('/');
+    } catch (err) {
+      setError('Invalid username or password');
+    }
   };
 
   const renderForm = (
     <>
       <Stack spacing={3}>
-        <TextField name="email" label="Email address" />
+        <TextField
+          name="username"
+          value={credentials.username}
+          onChange={handleChange}
+          label="User name"
+        />
 
         <TextField
           name="password"
-          label="Password"
+          label="Mật khẩu"
           type={showPassword ? 'text' : 'password'}
+          value={credentials.password}
+          onChange={handleChange}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
@@ -60,13 +77,19 @@ export default function LoginView() {
         </Link>
       </Stack>
 
+      {error && (
+        <Typography color="error" variant="body2">
+          {error}
+        </Typography>
+      )}
+
       <LoadingButton
         fullWidth
         size="large"
         type="submit"
         variant="contained"
         color="inherit"
-        onClick={handleClick}
+        onClick={handleLogin}
       >
         Login
       </LoadingButton>

@@ -1,7 +1,10 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useContext } from 'react';
 import { Outlet, Navigate, useRoutes } from 'react-router-dom';
 
 import DashboardLayout from 'src/layouts/dashboard';
+import { AuthContext } from 'src/auth/AuthProvider';
+
+import ProtectedRoute from './ProtectedRoute';
 
 export const IndexPage = lazy(() => import('src/pages/app'));
 export const BlogPage = lazy(() => import('src/pages/blog'));
@@ -13,6 +16,8 @@ export const Page404 = lazy(() => import('src/pages/page-not-found'));
 // ----------------------------------------------------------------------
 
 export default function Router() {
+  const { user } = useContext(AuthContext);
+
   const routes = useRoutes([
     {
       element: (
@@ -23,16 +28,20 @@ export default function Router() {
         </DashboardLayout>
       ),
       children: [
-        { element: <IndexPage />, index: true },
-        { path: 'user', element: <UserPage /> },
-        { path: 'products', element: <ProductsPage /> },
-        { path: 'blog', element: <BlogPage /> },
-        { path: 'blog', element: <BlogPage /> },
+        // { element: <IndexPage />, index: true },
+        { path: '/', element: <ProtectedRoute />, children: [{ element: <IndexPage /> }] },
+        { path: 'user', element: <ProtectedRoute />, children: [{ element: <UserPage /> }] },
+        {
+          path: 'products',
+          element: <ProtectedRoute />,
+          children: [{ element: <ProductsPage /> }],
+        },
+        { path: 'blog', element: <ProtectedRoute />, children: [{ element: <BlogPage /> }] },
       ],
     },
     {
       path: 'login',
-      element: <LoginPage />,
+      element: user ? <Navigate to="/" /> : <LoginPage />,
     },
     {
       path: '404',
