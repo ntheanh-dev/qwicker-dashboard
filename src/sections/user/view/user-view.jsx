@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useReducer } from 'react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -14,6 +14,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
 
 import { users } from 'src/_mock/user';
+import { authAPI, END_POINTS } from 'src/configs/api';
 
 import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
@@ -37,7 +38,7 @@ const style = {
   bgcolor: 'background.paper',
   boxShadow: 24,
   p: 4,
-  borderRadius: 2
+  borderRadius: 2,
 };
 export default function UserPage() {
   const [page, setPage] = useState(0);
@@ -53,6 +54,37 @@ export default function UserPage() {
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const [open, setOpen] = useState(false);
+
+  const [accountData, setAccountData] = useReducer(
+    (prev, next) => ({
+      ...prev,
+      ...next,
+    }),
+    {
+      basicAccount: [],
+      shipperAccount: [],
+    }
+  );
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const userAccountRes = await authAPI().get(END_POINTS.getAllAccount('accountType=USER'));
+        const shipperAccountRes = await authAPI().get(
+          END_POINTS.getAllAccount('accountType=SHIPPER')
+        );
+        setAccountData({
+          basicAccount: [...userAccountRes.data.result],
+          shipperAccountRes: [...shipperAccountRes.data.result],
+        });
+      } catch (error) {
+        console.error('Fetch data failed:', error);
+      }
+    };
+
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -116,10 +148,14 @@ export default function UserPage() {
   return (
     <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">Bệnh nhân</Typography>
+        <Typography variant="h4">Người dùng cơ bản</Typography>
 
-        <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />}
-          onClick={handleOpen}>
+        <Button
+          variant="contained"
+          color="inherit"
+          startIcon={<Iconify icon="eva:plus-fill" />}
+          onClick={handleOpen}
+        >
           Tạo mới
         </Button>
       </Stack>
@@ -129,12 +165,16 @@ export default function UserPage() {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Box sx={style} xs={12} >
-          <Button onClick={handleClose} sx={{
-            position: 'absolute', right: 40, borderRadius: 35,
-            backgroundColor: "#fff",
-            color: '#000'
-          }}
+        <Box sx={style} xs={12}>
+          <Button
+            onClick={handleClose}
+            sx={{
+              position: 'absolute',
+              right: 40,
+              borderRadius: 35,
+              backgroundColor: '#fff',
+              color: '#000',
+            }}
           >
             <Iconify icon="ic:baseline-close" />
           </Button>
@@ -146,22 +186,61 @@ export default function UserPage() {
           </Box>
           <Grid container spacing={1}>
             <Grid item xs={12} md={6}>
-              <TextField id="outlined-basic-1" label="Họ và tên lót" variant="outlined" size="small" sx={{ width: '96%' }} />
+              <TextField
+                id="outlined-basic-1"
+                label="Họ và tên lót"
+                variant="outlined"
+                size="small"
+                sx={{ width: '96%' }}
+              />
             </Grid>
             <Grid item xs={12} md={6}>
-              <TextField id="outlined-basic-2" label="Tên" variant="outlined" size="small" sx={{ width: '96%' }} />
+              <TextField
+                id="outlined-basic-2"
+                label="Tên"
+                variant="outlined"
+                size="small"
+                sx={{ width: '96%' }}
+              />
             </Grid>
             <Grid item xs={12} md={6} mt={2}>
-              <TextField id="outlined-basic-2" label="Địa chỉ" variant="outlined" size="small" sx={{ width: '96%' }} />
+              <TextField
+                id="outlined-basic-2"
+                label="Địa chỉ"
+                variant="outlined"
+                size="small"
+                sx={{ width: '96%' }}
+              />
             </Grid>
             <Grid item xs={12} md={6} mt={2}>
-              <TextField id="outlined-basic-2" label="Số điện thoại" variant="outlined" size="small" sx={{ width: '96%' }} type='number' />
+              <TextField
+                id="outlined-basic-2"
+                label="Số điện thoại"
+                variant="outlined"
+                size="small"
+                sx={{ width: '96%' }}
+                type="number"
+              />
             </Grid>
             <Grid item xs={12} md={6} mt={2}>
-              <TextField id="outlined-basic-2" label="Email" variant="outlined" size="small" sx={{ width: '96%' }} type='email' />
+              <TextField
+                id="outlined-basic-2"
+                label="Email"
+                variant="outlined"
+                size="small"
+                sx={{ width: '96%' }}
+                type="email"
+              />
             </Grid>
             <Grid item xs={12} md={6} mt={2}>
-              <TextField id="outlined-basic-2" label="Password" variant="outlined" size="small" sx={{ width: '96%' }} type='password' />
+              <TextField
+                id="outlined-basic-2"
+                label="Password"
+                variant="outlined"
+                size="small"
+                sx={{ width: '96%' }}
+                type="password"
+              />
             </Grid>
             <Grid item xs={12} md={6} mt={2}>
               <Button
@@ -170,18 +249,26 @@ export default function UserPage() {
                 startIcon={<Iconify icon="clarity:avatar-solid" />}
               >
                 Tải hình đại diện
-                <input
-                  type="file"
-                  hidden
-                />
+                <input type="file" hidden />
               </Button>
             </Grid>
           </Grid>
           <Box spacing={3} sx={{ right: 50, position: 'absolute' }}>
-            <Button variant="contained" component="label" color="grey" sx={{ mr: 1 }} startIcon={<Iconify icon="mdi:remove" />} onClick={handleClose}>
+            <Button
+              variant="contained"
+              component="label"
+              color="grey"
+              sx={{ mr: 1 }}
+              startIcon={<Iconify icon="mdi:remove" />}
+              onClick={handleClose}
+            >
               Đóng
             </Button>
-            <Button variant="contained" component="label" startIcon={<Iconify icon="material-symbols:save-outline" />}>
+            <Button
+              variant="contained"
+              component="label"
+              startIcon={<Iconify icon="material-symbols:save-outline" />}
+            >
               Lưu
             </Button>
           </Box>
@@ -250,7 +337,6 @@ export default function UserPage() {
           rowsPerPageOptions={[5, 10, 25]}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
-
       </Card>
 
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5} mt={5}>
@@ -325,6 +411,6 @@ export default function UserPage() {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Card>
-    </Container >
+    </Container>
   );
 }

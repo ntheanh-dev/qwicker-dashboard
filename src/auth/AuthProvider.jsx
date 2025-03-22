@@ -12,7 +12,6 @@ export const AuthProvider = ({ children }) => {
   const login = async (username, password) => {
     try {
       const res = await api.post(END_POINTS.token, { username, password });
-      console.log('res: ', res);
       setUser(res.data.result);
       Cookies.set('token', res.data.result.token, { expires: 7 });
     } catch (error) {

@@ -1,8 +1,11 @@
 import { faker } from '@faker-js/faker';
+import { useEffect, useReducer } from 'react';
 
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
+
+import { authAPI, END_POINTS } from 'src/configs/api';
 
 import Iconify from 'src/components/iconify';
 
@@ -19,6 +22,38 @@ import AppConversionRates from '../app-conversion-rates';
 // ----------------------------------------------------------------------
 
 export default function AppView() {
+  const [staticData, setStaticData] = useReducer(
+    (prev, next) => ({
+      ...prev,
+      ...next,
+    }),
+    {
+      basicAccount: 0,
+      shipperAccount: 0,
+      totalPosts: 0,
+      finishedPosts: 0,
+    }
+  );
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const accountRes = await authAPI().get(END_POINTS.totalAccount);
+        const accountData = await accountRes.data;
+
+        const numPostRes = await authAPI().get(END_POINTS.totalPost);
+        const numPostData = await numPostRes.data;
+
+        setStaticData({ ...accountData.result, ...numPostData.result });
+      } catch (error) {
+        console.error('Fetch data failed:', error);
+      }
+    };
+
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <Container maxWidth="xl">
       <Typography variant="h4" sx={{ mb: 5 }}>
@@ -28,37 +63,37 @@ export default function AppView() {
       <Grid container spacing={3}>
         <Grid xs={12} sm={6} md={3}>
           <AppWidgetSummary
-            title="Doanh số"
-            total={714000}
+            title="Tài khoản cơ bản"
+            total={staticData.basicUserAccount}
             color="success"
-            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_bag.png" />}
-          />
-        </Grid>
-
-        <Grid xs={12} sm={6} md={3}>
-          <AppWidgetSummary
-            title="Người dùng đăng ký mới"
-            total={1352831}
-            color="info"
             icon={<img alt="icon" src="/assets/icons/glass/ic_glass_users.png" />}
           />
         </Grid>
 
         <Grid xs={12} sm={6} md={3}>
           <AppWidgetSummary
-            title="Lịch hẹn"
-            total={1723315}
-            color="warning"
-            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_buy.png" />}
+            title="Tài khoản shipper"
+            total={staticData.shipperAccount}
+            color="info"
+            icon={<img alt="icon" src="/assets/icons/glass/shipper.png" />}
           />
         </Grid>
 
         <Grid xs={12} sm={6} md={3}>
           <AppWidgetSummary
-            title="Báo cáo lỗi"
-            total={234}
+            title="Tổng số đơn hàng"
+            total={staticData.totalPosts}
+            color="warning"
+            icon={<img alt="icon" src="/assets/icons/glass/checklist.png" />}
+          />
+        </Grid>
+
+        <Grid xs={12} sm={6} md={3}>
+          <AppWidgetSummary
+            title="Đơn hàng đã giao"
+            total={staticData.finishedPosts}
             color="error"
-            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_message.png" />}
+            icon={<img alt="icon" src="/assets/icons/glass/done.png" />}
           />
         </Grid>
 

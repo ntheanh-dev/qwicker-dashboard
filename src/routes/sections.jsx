@@ -29,14 +29,26 @@ export default function Router() {
       ),
       children: [
         // { element: <IndexPage />, index: true },
-        { path: '/', element: <ProtectedRoute />, children: [{ element: <IndexPage /> }] },
-        { path: 'user', element: <ProtectedRoute />, children: [{ element: <UserPage /> }] },
+        {
+          path: '/',
+          element: <ProtectedRoute route={IndexPage} />,
+          children: [{ element: <IndexPage /> }],
+        },
+        {
+          path: 'user',
+          element: <ProtectedRoute route={UserPage} />,
+          children: [{ element: <UserPage /> }],
+        },
         {
           path: 'products',
-          element: <ProtectedRoute />,
+          element: <ProtectedRoute route={ProductsPage} />,
           children: [{ element: <ProductsPage /> }],
         },
-        { path: 'blog', element: <ProtectedRoute />, children: [{ element: <BlogPage /> }] },
+        {
+          path: 'blog',
+          element: <ProtectedRoute route={BlogPage} />,
+          children: [{ element: <BlogPage /> }],
+        },
       ],
     },
     {

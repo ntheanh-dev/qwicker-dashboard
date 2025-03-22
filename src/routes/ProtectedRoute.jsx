@@ -3,11 +3,10 @@ import { Navigate } from 'react-router-dom';
 
 import { AuthContext } from 'src/auth/AuthProvider';
 
-import { AppView } from 'src/sections/overview/view';
-
-const ProtectedRoute = () => {
+// eslint-disable-next-line react/prop-types
+const ProtectedRoute = ({ route: Route }) => {
   const { user } = useContext(AuthContext);
-  return user ? <AppView /> : <Navigate to="/login" />;
+  return user ? <Route /> : <Navigate to="/login" />;
 };
 
 export default ProtectedRoute;

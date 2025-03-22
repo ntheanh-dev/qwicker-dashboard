@@ -13,7 +13,7 @@ const navConfig = [
     icon: icon('ic_analytics'),
   },
   {
-    title: 'Bệnh nhân',
+    title: 'Tài khoản',
     path: '/user',
     icon: icon('ic_user'),
   },
