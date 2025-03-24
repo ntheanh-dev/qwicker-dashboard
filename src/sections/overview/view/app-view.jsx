@@ -32,6 +32,7 @@ export default function AppView() {
       shipperAccount: 0,
       totalPosts: 0,
       finishedPosts: 0,
+      orderStatisticByVehicle: {},
     }
   );
 
@@ -44,7 +45,16 @@ export default function AppView() {
         const numPostRes = await authAPI().get(END_POINTS.totalPost);
         const numPostData = await numPostRes.data;
 
-        setStaticData({ ...accountData.result, ...numPostData.result });
+        const orderStatisticByVehicle = await authAPI().get(END_POINTS.getPostStatisticByVehicle);
+        const orderStatisticByVehicleData = await orderStatisticByVehicle.data;
+
+        setStaticData({
+          ...accountData.result,
+          ...numPostData.result,
+          orderStatisticByVehicle: { ...orderStatisticByVehicleData.result },
+        });
+
+        console.log('Fetch data successfully:', staticData);
       } catch (error) {
         console.error('Fetch data failed:', error);
       }
@@ -141,14 +151,12 @@ export default function AppView() {
 
         <Grid xs={12} md={6} lg={4}>
           <AppCurrentVisits
-            title="Người dùng ghé thăm"
+            title="Đơn hàng theo phương tiện"
             chart={{
-              series: [
-                { label: 'Châu mỹ', value: 4344 },
-                { label: 'Châu Á', value: 5435 },
-                { label: 'Châu Âu', value: 1443 },
-                { label: 'Châu Phi', value: 4443 },
-              ],
+              series: Object.keys(staticData.orderStatisticByVehicle).map((key) => ({
+                label: key,
+                value: staticData.orderStatisticByVehicle[key],
+              })),
             }}
           />
         </Grid>
