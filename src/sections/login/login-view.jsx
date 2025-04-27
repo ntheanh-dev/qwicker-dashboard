@@ -26,7 +26,7 @@ import Iconify from 'src/components/iconify';
 export default function LoginView() {
   const theme = useTheme();
   const router = useRouter();
-  const [credentials, setCredentials] = useState({ username: '', password: '' });
+  const [credentials, setCredentials] = useState({ username: 'admin', password: 'admin' });
   const { login } = useContext(AuthContext);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');

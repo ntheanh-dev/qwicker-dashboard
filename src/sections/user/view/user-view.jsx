@@ -13,7 +13,6 @@ import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
 
-import { users } from 'src/_mock/user';
 import { authAPI, END_POINTS } from 'src/configs/api';
 
 import Iconify from 'src/components/iconify';
@@ -25,7 +24,6 @@ import UserTableHead from '../user-table-head';
 import TableEmptyRows from '../table-empty-rows';
 import UserTableToolbar from '../user-table-toolbar';
 import { emptyRows, applyFilter, getComparator } from '../utils';
-
 // ----------------------------------------------------------------------
 const style = {
   flex: 1,
@@ -55,16 +53,7 @@ export default function UserPage() {
 
   const [open, setOpen] = useState(false);
 
-  const [accountData, setAccountData] = useReducer(
-    (prev, next) => ({
-      ...prev,
-      ...next,
-    }),
-    {
-      basicAccount: [],
-      shipperAccount: [],
-    }
-  );
+  const [accountData, setAccountData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -73,10 +62,7 @@ export default function UserPage() {
         const shipperAccountRes = await authAPI().get(
           END_POINTS.getAllAccount('accountType=SHIPPER')
         );
-        setAccountData({
-          basicAccount: [...userAccountRes.data.result],
-          shipperAccountRes: [...shipperAccountRes.data.result],
-        });
+        setAccountData([...userAccountRes.data.result, ...shipperAccountRes.data.result]);
       } catch (error) {
         console.error('Fetch data failed:', error);
       }
@@ -98,7 +84,7 @@ export default function UserPage() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = users.map((n) => n.name);
+      const newSelecteds = accountData.map((n) => n.name);
       setSelected(newSelecteds);
       return;
     }
@@ -138,7 +124,7 @@ export default function UserPage() {
   };
 
   const dataFiltered = applyFilter({
-    inputData: users,
+    inputData: accountData,
     comparator: getComparator(order, orderBy),
     filterName,
   });
@@ -148,7 +134,7 @@ export default function UserPage() {
   return (
     <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">Người dùng cơ bản</Typography>
+        <Typography variant="h4">Tài khoản</Typography>
 
         <Button
           variant="contained"
@@ -184,6 +170,7 @@ export default function UserPage() {
               Tạo mới người dùng
             </Typography>
           </Box>
+
           <Grid container spacing={1}>
             <Grid item xs={12} md={6}>
               <TextField
@@ -287,14 +274,14 @@ export default function UserPage() {
               <UserTableHead
                 order={order}
                 orderBy={orderBy}
-                rowCount={users.length}
+                rowCount={accountData.length}
                 numSelected={selected.length}
                 onRequestSort={handleSort}
                 onSelectAllClick={handleSelectAllClick}
                 headLabel={[
-                  { id: 'name', label: 'Họ và tên' },
-                  { id: 'company', label: 'Thông tin' },
-                  { id: 'role', label: 'Role' },
+                  { id: 'username', label: 'Tài khoản' },
+                  { id: 'email', label: 'Email' },
+                  { id: 'roles', label: 'Role' },
                   { id: 'isVerified', label: 'Xác thực', align: 'center' },
                   { id: 'status', label: 'Trạng thái' },
                   { id: '' },
@@ -306,12 +293,14 @@ export default function UserPage() {
                   .map((row) => (
                     <UserTableRow
                       key={row.id}
-                      name={row.name}
-                      role={row.role}
+                      email={row.email}
+                      username={row.username}
+                      role={
+                        row.roles !== undefined && row.roles.length > 0 ? row.roles[0].name : ''
+                      }
                       status={row.status}
-                      company={row.company}
-                      avatarUrl={row.avatarUrl}
-                      isVerified={row.isVerified}
+                      avatarUrl={() => '/assets/images/avatars/default.png'}
+                      isVerified={() => 'Rồi'}
                       selected={selected.indexOf(row.name) !== -1}
                       handleClick={(event) => handleClick(event, row.name)}
                     />
@@ -319,7 +308,7 @@ export default function UserPage() {
 
                 <TableEmptyRows
                   height={77}
-                  emptyRows={emptyRows(page, rowsPerPage, users.length)}
+                  emptyRows={emptyRows(page, rowsPerPage, accountData.length)}
                 />
 
                 {notFound && <TableNoData query={filterName} />}
@@ -331,80 +320,7 @@ export default function UserPage() {
         <TablePagination
           page={page}
           component="div"
-          count={users.length}
-          rowsPerPage={rowsPerPage}
-          onPageChange={handleChangePage}
-          rowsPerPageOptions={[5, 10, 25]}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </Card>
-
-      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5} mt={5}>
-        <Typography variant="h4">Bác sĩ</Typography>
-
-        <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />}>
-          Tạo mới
-        </Button>
-      </Stack>
-
-      <Card>
-        <UserTableToolbar
-          numSelected={selected.length}
-          filterName={filterName}
-          onFilterName={handleFilterByName}
-        />
-
-        <Scrollbar>
-          <TableContainer sx={{ overflow: 'unset' }}>
-            <Table sx={{ minWidth: 800 }}>
-              <UserTableHead
-                order={order}
-                orderBy={orderBy}
-                rowCount={users.length}
-                numSelected={selected.length}
-                onRequestSort={handleSort}
-                onSelectAllClick={handleSelectAllClick}
-                headLabel={[
-                  { id: 'name', label: 'Name' },
-                  { id: 'company', label: 'Company' },
-                  { id: 'role', label: 'Role' },
-                  { id: 'isVerified', label: 'Verified', align: 'center' },
-                  { id: 'status', label: 'Status' },
-                  { id: '' },
-                ]}
-              />
-              <TableBody>
-                {dataFiltered
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => (
-                    <UserTableRow
-                      key={row.id}
-                      name={row.name}
-                      role={row.role}
-                      status={row.status}
-                      company={row.company}
-                      avatarUrl={row.avatarUrl}
-                      isVerified={row.isVerified}
-                      selected={selected.indexOf(row.name) !== -1}
-                      handleClick={(event) => handleClick(event, row.name)}
-                    />
-                  ))}
-
-                <TableEmptyRows
-                  height={77}
-                  emptyRows={emptyRows(page, rowsPerPage, users.length)}
-                />
-
-                {notFound && <TableNoData query={filterName} />}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Scrollbar>
-
-        <TablePagination
-          page={page}
-          component="div"
-          count={users.length}
+          count={accountData.length}
           rowsPerPage={rowsPerPage}
           onPageChange={handleChangePage}
           rowsPerPageOptions={[5, 10, 25]}
