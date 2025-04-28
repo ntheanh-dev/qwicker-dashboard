@@ -19,11 +19,12 @@ import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
 
 import TableNoData from '../table-no-data';
-import UserTableRow from '../user-table-row';
-import UserTableHead from '../user-table-head';
 import TableEmptyRows from '../table-empty-rows';
-import UserTableToolbar from '../user-table-toolbar';
+import VehicleTableRow from '../vehicle-table-row';
+import VehicleTableHead from '../vehicle-table-head';
+import VehicleTableToolbar from '../vehicle-table-toolbar';
 import { emptyRows, applyFilter, getComparator } from '../utils';
+
 // ----------------------------------------------------------------------
 const style = {
   flex: 1,
@@ -38,7 +39,7 @@ const style = {
   p: 4,
   borderRadius: 2,
 };
-export default function UserPage() {
+function VehiclePage() {
   const [page, setPage] = useState(0);
 
   const [order, setOrder] = useState('asc');
@@ -53,16 +54,13 @@ export default function UserPage() {
 
   const [open, setOpen] = useState(false);
 
-  const [accountData, setAccountData] = useState([]);
+  const [vehicle, setVehicle] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const userAccountRes = await authAPI().get(END_POINTS.getAllAccount('accountType=USER'));
-        const shipperAccountRes = await authAPI().get(
-          END_POINTS.getAllAccount('accountType=SHIPPER')
-        );
-        setAccountData([...userAccountRes.data.result, ...shipperAccountRes.data.result]);
+        const res = await authAPI().get(END_POINTS.getAllVehicle);
+        setVehicle([...res.data.result]);
       } catch (error) {
         console.error('Fetch data failed:', error);
       }
@@ -84,7 +82,7 @@ export default function UserPage() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = accountData.map((n) => n.name);
+      const newSelecteds = vehicle.map((n) => n.name);
       setSelected(newSelecteds);
       return;
     }
@@ -124,7 +122,7 @@ export default function UserPage() {
   };
 
   const dataFiltered = applyFilter({
-    inputData: accountData,
+    inputData: vehicle,
     comparator: getComparator(order, orderBy),
     filterName,
   });
@@ -262,7 +260,7 @@ export default function UserPage() {
         </Box>
       </Modal>
       <Card>
-        <UserTableToolbar
+        <VehicleTableToolbar
           numSelected={selected.length}
           filterName={filterName}
           onFilterName={handleFilterByName}
@@ -271,19 +269,17 @@ export default function UserPage() {
         <Scrollbar>
           <TableContainer sx={{ overflow: 'unset' }}>
             <Table sx={{ minWidth: 800 }}>
-              <UserTableHead
+              <VehicleTableHead
                 order={order}
                 orderBy={orderBy}
-                rowCount={accountData.length}
+                rowCount={vehicle.length}
                 numSelected={selected.length}
                 onRequestSort={handleSort}
                 onSelectAllClick={handleSelectAllClick}
                 headLabel={[
-                  { id: 'username', label: 'Tài khoản' },
-                  { id: 'email', label: 'Email' },
-                  { id: 'roles', label: 'Role' },
-                  { id: 'isVerified', label: 'Xác thực', align: 'center' },
-                  { id: 'status', label: 'Trạng thái' },
+                  { id: 'name', label: 'Tên' },
+                  { id: 'capacity', label: 'Sức chứa' },
+                  { id: 'description', label: 'Mô tả thêm' },
                   { id: '' },
                 ]}
               />
@@ -291,16 +287,12 @@ export default function UserPage() {
                 {dataFiltered
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row) => (
-                    <UserTableRow
+                    <VehicleTableRow
                       key={row.id}
-                      email={row.email}
-                      username={row.username}
-                      role={
-                        row.roles !== undefined && row.roles.length > 0 ? row.roles[0].name : ''
-                      }
-                      status={row.status}
-                      avatarUrl={() => '/assets/images/avatars/default.png'}
-                      isVerified={() => 'Rồi'}
+                      name={row.name}
+                      iconUrl={row.icon}
+                      capacity={row.capacity}
+                      description={row.description}
                       selected={selected.indexOf(row.name) !== -1}
                       handleClick={(event) => handleClick(event, row.name)}
                     />
@@ -308,7 +300,7 @@ export default function UserPage() {
 
                 <TableEmptyRows
                   height={77}
-                  emptyRows={emptyRows(page, rowsPerPage, accountData.length)}
+                  emptyRows={emptyRows(page, rowsPerPage, vehicle.length)}
                 />
 
                 {notFound && <TableNoData query={filterName} />}
@@ -320,7 +312,7 @@ export default function UserPage() {
         <TablePagination
           page={page}
           component="div"
-          count={accountData.length}
+          count={vehicle.length}
           rowsPerPage={rowsPerPage}
           onPageChange={handleChangePage}
           rowsPerPageOptions={[5, 10, 25]}
@@ -330,3 +322,5 @@ export default function UserPage() {
     </Container>
   );
 }
+
+export default VehiclePage;

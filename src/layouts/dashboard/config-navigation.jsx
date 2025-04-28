@@ -18,19 +18,14 @@ const navConfig = [
     icon: icon('ic_user'),
   },
   {
-    title: 'Lịch hẹn',
+    title: 'Đơn hàng',
     path: '/products',
     icon: icon('ic_cart'),
   },
   {
-    title: 'Bài viết',
-    path: '/blog',
-    icon: icon('ic_blog'),
-  },
-  {
-    title: 'login',
-    path: '/login',
-    icon: icon('ic_lock'),
+    title: 'Phương tiện',
+    path: '/vehicle',
+    icon: icon('car-svgrepo-com'),
   },
   {
     title: 'Not found',

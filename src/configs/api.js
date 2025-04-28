@@ -9,6 +9,7 @@ export const END_POINTS = {
   totalPost: '/post/posts/total',
   getAllAccount: (param) => `/identity/accounts?${param}`,
   getPostStatisticByVehicle: '/post/vehicles/order-statistic',
+  getAllVehicle: 'post/vehicles',
 };
 
 export const authAPI = () =>
