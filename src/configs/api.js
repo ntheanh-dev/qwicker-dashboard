@@ -6,10 +6,11 @@ export const BASE_URL = `http://localhost:8888/api/v3/`;
 export const END_POINTS = {
   token: '/identity/auth/token',
   totalAccount: '/identity/accounts/total',
-  totalPost: '/post/posts/total',
+  totalPost: '/post/posts/statistic/total',
   getAllAccount: (param) => `/identity/accounts?${param}`,
   getPostStatisticByVehicle: '/post/vehicles/order-statistic',
   getAllVehicle: 'post/vehicles',
+  getAllPost: (param) => `/post/posts/statistic?${param}`,
 };
 
 export const authAPI = () =>

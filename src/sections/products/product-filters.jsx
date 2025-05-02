@@ -26,23 +26,30 @@ export const SORT_OPTIONS = [
   { value: 'priceDesc', label: 'Price: High-Low' },
   { value: 'priceAsc', label: 'Price: Low-High' },
 ];
-export const GENDER_OPTIONS = ['Men', 'Women', 'Kids'];
-export const CATEGORY_OPTIONS = ['All', 'Shose', 'Apparel', 'Accessories'];
+export const GENDER_OPTIONS = [
+  'ORDER_CREATED',
+  'WAITING_PAY',
+  'FINDING_SHIPPER',
+  'SEARCH_TIMEOUT',
+  'SHIPPER_FOUND',
+  'PICKED_UP',
+  'DELIVERED',
+  'CANCELED_BY_USER',
+  'CANCELED_BY_SHIPPER',
+];
+export const CATEGORY_OPTIONS = [
+  'Thực phẩm & đồ uống',
+  'Văn phòng phẩm',
+  'Quần áo & Phụ kiện',
+  'Đồ điện tử',
+  'Nguyên liệu / Linh kiện',
+  'Đồ gia dụng / Nội thất',
+];
 export const RATING_OPTIONS = ['up4Star', 'up3Star', 'up2Star', 'up1Star'];
 export const PRICE_OPTIONS = [
   { value: 'below', label: 'Below $25' },
   { value: 'between', label: 'Between $25 - $75' },
   { value: 'above', label: 'Above $75' },
-];
-export const COLOR_OPTIONS = [
-  '#00AB55',
-  '#000000',
-  '#FFFFFF',
-  '#FFC0CB',
-  '#FF4842',
-  '#1890FF',
-  '#94D82D',
-  '#FFC107',
 ];
 
 // ----------------------------------------------------------------------
@@ -50,7 +57,7 @@ export const COLOR_OPTIONS = [
 export default function ProductFilters({ openFilter, onOpenFilter, onCloseFilter }) {
   const renderGender = (
     <Stack spacing={1}>
-      <Typography variant="subtitle2">Gender</Typography>
+      <Typography variant="subtitle2">Tình trạng</Typography>
       <FormGroup>
         {GENDER_OPTIONS.map((item) => (
           <FormControlLabel key={item} control={<Checkbox />} label={item} />
@@ -61,25 +68,12 @@ export default function ProductFilters({ openFilter, onOpenFilter, onCloseFilter
 
   const renderCategory = (
     <Stack spacing={1}>
-      <Typography variant="subtitle2">Category</Typography>
+      <Typography variant="subtitle2">Loại hàng</Typography>
       <RadioGroup>
         {CATEGORY_OPTIONS.map((item) => (
           <FormControlLabel key={item} value={item} control={<Radio />} label={item} />
         ))}
       </RadioGroup>
-    </Stack>
-  );
-
-  const renderColors = (
-    <Stack spacing={1}>
-      <Typography variant="subtitle2">Colors</Typography>
-      <ColorPicker
-        name="colors"
-        selected={[]}
-        colors={COLOR_OPTIONS}
-        onSelectColor={(color) => [].includes(color)}
-        sx={{ maxWidth: 38 * 4 }}
-      />
     </Stack>
   );
 
@@ -170,8 +164,6 @@ export default function ProductFilters({ openFilter, onOpenFilter, onCloseFilter
             {renderGender}
 
             {renderCategory}
-
-            {renderColors}
 
             {renderPrice}
 
