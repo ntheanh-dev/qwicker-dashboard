@@ -2,16 +2,13 @@ import { useState, useEffect } from 'react';
 
 import Stack from '@mui/material/Stack';
 import Container from '@mui/material/Container';
-import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 import { Card, Table, TableBody, TableContainer, TablePagination } from '@mui/material';
 
-import { products } from 'src/_mock/products';
 import { authAPI, END_POINTS } from 'src/configs/api';
 
 import Scrollbar from 'src/components/scrollbar';
 
-import ProductCard from '../product-card';
 import ProductSort from '../product-sort';
 import TableNoData from '../table-no-data';
 import OrderTableRow from '../order-table-row';
@@ -37,8 +34,6 @@ export default function ProductsView() {
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  const [open, setOpen] = useState(false);
-
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
@@ -47,8 +42,6 @@ export default function ProductsView() {
         const res = await authAPI().get(END_POINTS.getAllPost('status=SEARCH_TIMEOUT'));
         const orderData = await res.data;
         setOrders(orderData.result);
-
-        console.log('Fetch data successfully:', orderData.result);
       } catch (error) {
         console.error('Fetch data failed:', error);
       }
@@ -65,9 +58,6 @@ export default function ProductsView() {
   const handleCloseFilter = () => {
     setOpenFilter(false);
   };
-
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
   const handleSort = (event, id) => {
     const isAsc = orderBy === id && order === 'asc';
     if (id !== '') {
@@ -195,6 +185,7 @@ export default function ProductsView() {
                       status={row.status}
                       selected={selected.indexOf(row.name) !== -1}
                       handleClick={(event) => handleClick(event, row.name)}
+                      data={row}
                     />
                   ))}
 

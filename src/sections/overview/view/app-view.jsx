@@ -119,22 +119,10 @@ export default function AppView() {
               ],
               series: [
                 {
-                  name: 'Team A',
+                  name: '',
                   type: 'column',
                   fill: 'solid',
                   data: [23, 11, 22, 27, 13, 22, 37, 21, 44, 22, 30],
-                },
-                {
-                  name: 'Team B',
-                  type: 'area',
-                  fill: 'gradient',
-                  data: [44, 55, 41, 67, 22, 43, 21, 41, 56, 27, 43],
-                },
-                {
-                  name: 'Team C',
-                  type: 'line',
-                  fill: 'solid',
-                  data: [30, 25, 36, 30, 45, 35, 64, 52, 59, 36, 39],
                 },
               ],
             }}
@@ -156,19 +144,18 @@ export default function AppView() {
         <Grid xs={12} md={6} lg={8}>
           <AppConversionRates
             title="Tỉ lệ"
-            subheader="(+43%) "
             chart={{
               series: [
-                { label: 'Italy', value: 400 },
-                { label: 'Japan', value: 430 },
-                { label: 'China', value: 448 },
-                { label: 'Canada', value: 470 },
-                { label: 'France', value: 540 },
-                { label: 'Germany', value: 580 },
-                { label: 'South Korea', value: 690 },
-                { label: 'Netherlands', value: 1100 },
-                { label: 'United States', value: 1200 },
-                { label: 'United Kingdom', value: 1380 },
+                { label: 'Thành phố Thủ Đức', value: 12 },
+                { label: 'Quân Bình Tân', value: 8 },
+                { label: 'Huyện Bình Chánh', value: 8 },
+                { label: 'Quận Gò Vấp', value: 6 },
+                { label: 'Quận 12', value: 6 },
+                { label: 'Quận Bình Thạnh', value: 5 },
+                { label: 'Huyện Hóc Môn', value: 5 },
+                { label: 'Huyện Củ Chi', value: 4 },
+                { label: 'Quận Tân Phú', value: 4 },
+                { label: 'Quận Tân Bình', value: 4 },
               ],
             }}
           />
