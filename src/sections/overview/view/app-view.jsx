@@ -15,6 +15,52 @@ import AppConversionRates from '../app-conversion-rates';
 
 // ----------------------------------------------------------------------
 
+function transformDataForChart(data) {
+  // Sắp xếp theo thứ tự tháng tăng dần
+  data.sort((a, b) => {
+    const [ma, ya] = a.month.split('-').map(Number);
+    const [mb, yb] = b.month.split('-').map(Number);
+    return new Date(ya, ma - 1) - new Date(yb, mb - 1);
+  });
+
+  const labels = data.map((d) => `01/${d.month}`);
+  const cashData = [];
+  const vnpayData = [];
+
+  data.forEach((d) => {
+    const amount = parseFloat(d.totalAmount);
+    if (d.paymentMethod === 'CASH') {
+      cashData.push(amount);
+      vnpayData.push(0);
+    } else if (d.paymentMethod === 'VNPAY') {
+      vnpayData.push(amount);
+      cashData.push(0);
+    } else {
+      // Nếu có loại thanh toán khác, có thể mở rộng ở đây
+      cashData.push(0);
+      vnpayData.push(0);
+    }
+  });
+
+  return {
+    labels,
+    series: [
+      {
+        name: 'CASH',
+        type: 'column',
+        fill: 'solid',
+        data: cashData,
+      },
+      {
+        name: 'VNPAY',
+        type: 'column',
+        fill: 'solid',
+        data: vnpayData,
+      },
+    ],
+  };
+}
+
 export default function AppView() {
   const [staticData, setStaticData] = useReducer(
     (prev, next) => ({
@@ -27,6 +73,7 @@ export default function AppView() {
       totalPosts: 0,
       finishedPosts: 0,
       orderStatisticByVehicle: {},
+      monthlyStatisticAmount: [],
     }
   );
 
@@ -42,10 +89,14 @@ export default function AppView() {
         const orderStatisticByVehicle = await authAPI().get(END_POINTS.getPostStatisticByVehicle);
         const orderStatisticByVehicleData = await orderStatisticByVehicle.data;
 
+        const monthlyStatisticAmountRest = await authAPI().get(END_POINTS.getTransactionAmount);
+        const monthlyStatisticAmountData = await monthlyStatisticAmountRest.data;
+
         setStaticData({
           ...accountData.result,
           ...numPostData.result,
           orderStatisticByVehicle: { ...orderStatisticByVehicleData.result },
+          monthlyStatisticAmount: [...monthlyStatisticAmountData.result],
         });
       } catch (error) {
         console.error('Fetch data failed:', error);
@@ -55,6 +106,8 @@ export default function AppView() {
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  console.log('monthlyStatisticAmount', staticData.monthlyStatisticAmount);
 
   return (
     <Container maxWidth="xl">
@@ -103,29 +156,7 @@ export default function AppView() {
           <AppWebsiteVisits
             title="Thống kê doanh thu"
             subheader="(+43%) hơn năm trước"
-            chart={{
-              labels: [
-                '01/01/2003',
-                '02/01/2003',
-                '03/01/2003',
-                '04/01/2003',
-                '05/01/2003',
-                '06/01/2003',
-                '07/01/2003',
-                '08/01/2003',
-                '09/01/2003',
-                '10/01/2003',
-                '11/01/2003',
-              ],
-              series: [
-                {
-                  name: '',
-                  type: 'column',
-                  fill: 'solid',
-                  data: [23, 11, 22, 27, 13, 22, 37, 21, 44, 22, 30],
-                },
-              ],
-            }}
+            chart={transformDataForChart(staticData.monthlyStatisticAmount)}
           />
         </Grid>
 

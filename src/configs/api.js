@@ -11,6 +11,7 @@ export const END_POINTS = {
   getPostStatisticByVehicle: '/post/vehicles/order-statistic',
   getAllVehicle: 'post/vehicles',
   getAllPost: (param) => `/post/posts/statistic?${param}`,
+  getTransactionAmount: '/payment/statistic/transaction-amount',
 };
 
 export const authAPI = () =>
